@@ -5,9 +5,8 @@ const path = require('path');
 const { MongoClient } = require('mongodb'); //imports mongoDB client
 require('dotenv').config(); // load variables from .env
 
-// mongoDB connection string
+// mongoDB connection string !!!change this to your mongo url!!!!
 const uri = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@cluster0.3j2zh.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`;
-
 // connect to MongoDB
 let db;
 let mongoClient;
@@ -154,7 +153,6 @@ app.post('/delete', async (req, res) => {
 
 app.get('/search', async (req, res) => {
     const {query} = req.query;
-
     try {
         const users = await db.collection('users').find({
             $or: [
