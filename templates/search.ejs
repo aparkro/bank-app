@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Search</title>
+    </head>
+    <body>
+        <h1>Search Results</h1>
+        <ul>
+            <% users.forEach(user => { %>
+                <li><%= user.name %> - <%= user.email %></li>
+            <% }) %>
+        </ul>
+    </body>
+</html>
+

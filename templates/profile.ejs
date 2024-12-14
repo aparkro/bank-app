@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Home Page</title>
+    </head>
+    <body>
+        <h1>Profile</h1>
+        <h1>User Profile</h1>
+        <p>Name: <%= user.name %></p>
+        <p>Email: <%= user.email %></p>
+
+
+        <!-- Delete User Form -->
+        <form action="/delete" method="POST">
+            <input type="hidden" name="email" value="<%= user.email %>">
+            <button type="submit">Delete Account</button>
+        </form>
+
+        <!-- Search Users Form -->
+        <h2>Search Users</h2>
+        <form action="/search" method="GET">
+            <input type="text" name="query" placeholder="Search by name or email" required>
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Display Search Results (if any) -->
+        <% if (typeof users !== 'undefined') { %>
+            <h2>Search Results</h2>
+            <ul>
+                <% users.forEach(user => { %>
+                    <li><%= user.name %> - <%= user.email %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+    </body>
+</html>
