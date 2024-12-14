@@ -11,20 +11,18 @@
         <p>Email: <%= user.email %></p>
 
 
-        <!-- Delete User Form -->
+        <!--delete-->
         <form action="/delete" method="POST">
             <input type="hidden" name="email" value="<%= user.email %>">
             <button type="submit">Delete Account</button>
         </form>
 
-        <!-- Search Users Form -->
+        <!--search-->
         <h2>Search Users</h2>
         <form action="/search" method="GET">
             <input type="text" name="query" placeholder="Search by name or email" required>
             <button type="submit">Search</button>
         </form>
-
-        <!-- Display Search Results (if any) -->
         <% if (typeof users !== 'undefined') { %>
             <h2>Search Results</h2>
             <ul>

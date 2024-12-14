@@ -6,7 +6,7 @@ const { MongoClient } = require('mongodb'); //imports mongoDB client
 require('dotenv').config(); // load variables from .env
 
 // mongoDB connection string
-const uri = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@cluster0.mlby5.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@cluster0.3j2zh.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`;
 
 // connect to MongoDB
 let db;
@@ -61,20 +61,27 @@ app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).send("Email and Password are required!");
+        return res.status(400).send(`
+            <p>Email and Password are required!</p>
+            <a href="/">Try again</a>`);
     }
 
     try {
         const user = await db.collection('users').findOne({ email, password });
 
         if (!user) {
-            return res.status(401).send("Invalid email or password!");
+            return res.status(401).send(`
+                <p>Invalid email or password!</p>
+                <a href="/">Try again</a>`);
         }
 
-        res.send("Login successful!");
+        res.redirect(`/profile?email=${encodeURIComponent(email)}`);
     } catch (err) {
         console.error("Error during login:", err);
-        res.status(500).send("Login failed.");
+        res.status(500).send(`
+            <p>Login failed.</p>
+            <a href="/">Try again</a>`
+        );
     }
 });
 
@@ -92,19 +99,76 @@ app.post('/signup', async (req, res) => {
         const existingUser = await db.collection('users').findOne({ email });
 
         if (existingUser) {
-            return res.status(400).send("Email is already registered!");
+            return res.status(400).send(`
+            <p>Email already registered!</p>
+            <a href="/signup">Try again</a>`);
         }
 
         await db.collection('users').insertOne(newUser);
-        res.send("Signup successful!");
+        res.redirect('/')
     } catch (err) {
         console.error("Error during signup:", err);
-        res.status(500).send("Signup failed.");
+        res.status(500).send(`
+            <p>Signup Failed.</p>
+            <a href="/signup">Try again</a>`);
     }
 });
- 
 
+app.get('/profile', async (req, res) => {
+    const { email } = req.query;
+    try {
+        const user = await db.collection('users').findOne({ email });
 
+        if (!user) {
+            return res.status(404).send("User not found.");
+        }
+
+        res.render('profile', { user });
+    } catch (err) {
+        console.error("Error fetching profile:", err);
+        res.status(500).send("Error fetching profile.");
+    }
+});
+
+//delete users
+app.post('/delete', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).send("Email is required to delete user!");
+    }
+
+    try {
+        const result = await db.collection('users').deleteOne({ email });
+        if (result.deletedCount === 0) {
+            return res.status(404).send(`
+                <p>User not found. Try to log in to another account.</p>
+                <a href="/">Here</a>`);
+        }
+        res.send("User deleted successfully!");
+    } catch (err) {
+        console.error("Error deleting user:", err);
+        res.status(500).send("Error deleting user.");
+    }
+});
+
+app.get('/search', async (req, res) => {
+    const {query} = req.query;
+
+    try {
+        const users = await db.collection('users').find({
+            $or: [
+                { name: { $regex: query, $options: 'i' } },
+                { email: { $regex: query, $options: 'i' } }
+            ]
+        }).toArray();
+
+        res.render('search', { users });
+    } catch (err) {
+        console.error("Error searching users:", err);
+        res.status(500).send("Error searching users.");
+    }
+});
 /* ROUTES STOP*/
 
 
