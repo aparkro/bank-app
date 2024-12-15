@@ -2,11 +2,11 @@
 const express = require('express'); //
 const app = express();  //creates an express instance
 const path = require('path'); 
-const { MongoClient } = require('mongodb'); //imports mongoDB client
+const { MongoClient, ServerApiVersion } = require('mongodb'); //imports mongoDB client
 require('dotenv').config(); // load variables from .env
 
 // mongoDB connection string !!!change this to your mongo url!!!!
-const uri = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@cluster0.3j2zh.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@cluster0.mlby5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // connect to MongoDB
 let db;
 let mongoClient;
