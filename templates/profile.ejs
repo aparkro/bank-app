@@ -1,32 +1,57 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Home Page</title>
-        <script>
-            // confirmation function for deleting the account
-            function confirmDeletion(event) {
-                const confirmed = confirm("Are you sure you want to delete your account? This action cannot be undone.");
-                if (!confirmed) {
-                    event.preventDefault(); // prevent the form from being submitted
-                }
+<head>
+    <meta charset="utf-8">
+    <title>Home Page</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+
+        .left-section {
+            width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .right-section {
+            width: 50%;
+            background-color: #f9f9f9;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: #888;
+        }
+    </style>
+    <script>
+        // confirmation function for deleting the account
+        function confirmDeletion(event) {
+            const confirmed = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+            if (!confirmed) {
+                event.preventDefault(); // prevent the form from being submitted
             }
-        </script>
-    </head>
-    <body>
+        }
+    </script>
+</head>
+<body>
+    <!--left section -->
+    <div class="left-section">
         <h1>Profile</h1>
-        <!-- Uses robohash API to generate a unique profile picture for each user -->
+        <!--uses robohash API to generate a unique profile picture for each user -->
         <img src="https://robohash.org/<%= user.email %>" alt="Profile Picture" style="width: 150px; height: 150px; border-radius: 50%;">
         <p>Name: <%= user.name %></p>
         <p>Email: <%= user.email %></p>
         <p>Balance: <%= user.balance %></p>
 
         <hr>
-        <hr>
-
-        <!-- Deposit and Withdraw buttons -->
-        <h3>Deposit / Withdraw</h2>
-        <!-- Deposit Form -->
+        <h3>Deposit / Withdraw</h3>
         <form action="/deposit" method="POST">
             <input type="hidden" name="email" value="<%= user.email %>">
             <label for="depositAmount">Deposit Amount:</label>
@@ -42,13 +67,12 @@
         </form>
 
         <br>
-
-        <!--search-->
-        <h3>Search Users</h2>
+        <h3>Search Users</h3>
         <form action="/search" method="GET">
             <input type="text" name="query" placeholder="Search by name or email" required>
             <button type="submit">Search</button>
         </form>
+
         <% if (typeof users !== 'undefined') { %>
             <h2>Search Results</h2>
             <ul>
@@ -58,24 +82,12 @@
             </ul>
         <% } %>
 
-        <!--list all users-->
         <form action="/list-all-users" method="GET">
             <button type="submit">List All Users</button>
         </form>
 
-        <% if (typeof users !== 'undefined') { %>
-            <h2>Search Results</h2>
-            <ul>
-                <% users.forEach(user => { %>
-                    <li><%= user.name %> - <%= user.email %></li>
-                <% }) %>
-            </ul>
-        <% } %>
-
         <br>
-
-        <!-- Transfer Form -->
-        <h3>Transfer Money</h2>
+        <h3>Transfer Money</h3>
         <form action="/transfer" method="POST">
             <input type="hidden" name="senderEmail" value="<%= user.email %>">
             <label for="recipientEmail">Recipient's Email:</label>
@@ -88,26 +100,21 @@
         </form>
 
         <br>
-
-        <!-- Logout Button -->
-        <h3>Logout</h2>
+        <h3>Logout</h3>
         <form action="/" method="GET">
             <button type="submit">Logout</button>
         </form>
-        
-        <br>
-        <hr>
-        <hr>
-        <br>
 
-        <!--delete-->
+        <br>
         <form action="/delete" method="POST" onsubmit="confirmDeletion(event)">
             <input type="hidden" name="email" value="<%= user.email %>">
             <button type="submit" style="background-color: #B22222; color: white;">Delete Account</button>
         </form>
+    </div>
 
-        <br>
-        <hr>
-
-    </body>
+    <!--right section -->
+    <div class="right-section">
+        Placeholder for future content
+    </div>
+</body>
 </html>
