@@ -3,6 +3,15 @@
     <head>
         <meta charset="utf-8">
         <title>Home Page</title>
+        <script>
+            // confirmation function for deleting the account
+            function confirmDeletion(event) {
+                const confirmed = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+                if (!confirmed) {
+                    event.preventDefault(); // prevent the form from being submitted
+                }
+            }
+        </script>
     </head>
     <body>
         <h1>Profile</h1>
@@ -47,6 +56,20 @@
             </ul>
         <% } %>
 
+        <!--list all users-->
+        <form action="/list-all-users" method="GET">
+            <button type="submit">List All Users</button>
+        </form>
+
+        <% if (typeof users !== 'undefined') { %>
+            <h2>Search Results</h2>
+            <ul>
+                <% users.forEach(user => { %>
+                    <li><%= user.name %> - <%= user.email %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+
         <br>
 
         <!-- Transfer Form -->
@@ -72,10 +95,11 @@
         
         <br>
         <hr>
+        <hr>
         <br>
 
         <!--delete-->
-        <form action="/delete" method="POST">
+        <form action="/delete" method="POST" onsubmit="confirmDeletion(event)">
             <input type="hidden" name="email" value="<%= user.email %>">
             <button type="submit" style="background-color: #B22222; color: white;">Delete Account</button>
         </form>

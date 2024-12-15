@@ -132,7 +132,7 @@ app.post('/delete', async (req, res) => {
                 <p>User not found. Try to log in to another account.</p>
                 <a href="/">Here</a>`);
         }
-        res.send("User deleted successfully!");
+        res.render('delete', { message: "User deleted successfully!" });
     } catch (err) {
         console.error("Error deleting user:", err);
         res.status(500).send("Error deleting user.");
@@ -158,8 +158,16 @@ app.get('/search', async (req, res) => {
 });
 
 
-
-
+//handles the list users page
+app.get('/list-all-users', async (req, res) => {
+    try {
+        const users = await db.collection('users').find().toArray(); // Fetch all users from the database
+        res.render('allUsers', { users }); // Render the new template with the user list
+    } catch (err) {
+        console.error("Error fetching all users:", err);
+        res.status(500).send("Error fetching users.");
+    }
+});
 
 
 
