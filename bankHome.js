@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
     res.render('index', { isSignup: false, error: null }); //uses a variable to toggle between login/signup
 });
 
-// renders the signup form that shows up when the user clicks "Login here"
+// renders the signup form that shows up when the user clicks "Signup here"
 app.get('/signup', (req, res) => {
     res.render('index', { isSignup: true, error: null }); // toggle to display signup form
 });
@@ -77,7 +77,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Handle signup form submission
+// handles the signup form submission
 app.post('/signup', async (req, res) => {
     const { email, password, name } = req.body;
 
@@ -100,6 +100,7 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+//handles the profile page
 app.get('/profile', async (req, res) => {
     const { email } = req.query;
     try {
@@ -138,6 +139,7 @@ app.post('/delete', async (req, res) => {
     }
 });
 
+//handles the search page
 app.get('/search', async (req, res) => {
     const {query} = req.query;
     try {
@@ -217,6 +219,49 @@ app.post('/withdraw', async (req, res) => {
         res.status(500).send("Error during withdraw.");
     }
 });
+
+
+
+
+// Transfer money
+app.post('/transfer', async (req, res) => {
+    const { senderEmail, recipientEmail, amount } = req.body;
+    const transferAmount = parseFloat(amount);
+
+    if (isNaN(transferAmount) || transferAmount <= 0) {
+        return res.status(400).send("Transfer amount must be a positive number.");
+    }
+
+    try {
+        // Find sender and recipient
+        const sender = await db.collection('users').findOne({ email: senderEmail });
+        const recipient = await db.collection('users').findOne({ email: recipientEmail });
+
+        if (!sender) {
+            return res.status(404).send("Sender not found.");
+        }
+        if (!recipient) {
+            return res.status(404).send("Recipient not found.");
+        }
+        if (sender.balance < transferAmount) {
+            return res.status(400).send("Insufficient funds.");
+        }
+
+        // Update balances
+        const newSenderBalance = sender.balance - transferAmount;
+        const newRecipientBalance = recipient.balance + transferAmount;
+
+        await db.collection('users').updateOne({ email: senderEmail }, { $set: { balance: newSenderBalance } });
+        await db.collection('users').updateOne({ email: recipientEmail }, { $set: { balance: newRecipientBalance } });
+
+        // Redirect back to sender's profile
+        res.redirect(`/profile?email=${encodeURIComponent(senderEmail)}`);
+    } catch (err) {
+        console.error("Error during transfer:", err);
+        res.status(500).send("Error during transfer.");
+    }
+});
+
 
 
 
