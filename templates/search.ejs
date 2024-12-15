@@ -9,6 +9,7 @@
         <ul>
             <% users.forEach(user => { %>
                 <li><%= user.name %> --- <%= user.email %> --- Balance: <%= user.balance %></li>
+                <img src="https://robohash.org/<%= user.email %>?size=100x100" alt="Profile Picture" style="border-radius: 50%;">
             <% }) %>
         </ul>
     </body>

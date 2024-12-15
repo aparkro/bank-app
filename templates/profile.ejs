@@ -15,6 +15,8 @@
     </head>
     <body>
         <h1>Profile</h1>
+        <!-- Uses robohash API to generate a unique profile picture for each user -->
+        <img src="https://robohash.org/<%= user.email %>" alt="Profile Picture" style="width: 150px; height: 150px; border-radius: 50%;">
         <p>Name: <%= user.name %></p>
         <p>Email: <%= user.email %></p>
         <p>Balance: <%= user.balance %></p>
