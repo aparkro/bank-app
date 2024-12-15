@@ -52,35 +52,29 @@ app.get('/', (req, res) => {
 
 // renders the signup form that shows up when the user clicks "Login here"
 app.get('/signup', (req, res) => {
-    res.render('index', { isSignup: true }); // Toggle to display signup form
+    res.render('index', { isSignup: true }); // toggle to display signup form
 });
 
-// Handle login form submission
+// handles the login form submission
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).send(`
-            <p>Email and Password are required!</p>
-            <a href="/">Try again</a>`);
+        return res.status(400).json({ success: false, message: "Email and Password are required!" });
     }
 
     try {
         const user = await db.collection('users').findOne({ email, password });
 
         if (!user) {
-            return res.status(401).send(`
-                <p>Invalid email or password!</p>
-                <a href="/">Try again</a>`);
+            return res.status(401).json({ success: false, message: "Invalid email or password!" });
         }
 
+        res.json({ success: true, message: "Login successful!", user: { email: user.email, name: user.name } });
         res.redirect(`/profile?email=${encodeURIComponent(email)}`);
     } catch (err) {
         console.error("Error during login:", err);
-        res.status(500).send(`
-            <p>Login failed.</p>
-            <a href="/">Try again</a>`
-        );
+        res.status(500).json({ success: false, message: "Login failed." });
     }
 });
 
@@ -98,18 +92,13 @@ app.post('/signup', async (req, res) => {
         const existingUser = await db.collection('users').findOne({ email });
 
         if (existingUser) {
-            return res.status(400).send(`
-            <p>Email already registered!</p>
-            <a href="/signup">Try again</a>`);
+            return res.status(400).json({ success: false, message: "Email already registered!" });
         }
 
         await db.collection('users').insertOne(newUser);
         res.redirect('/')
     } catch (err) {
-        console.error("Error during signup:", err);
-        res.status(500).send(`
-            <p>Signup Failed.</p>
-            <a href="/signup">Try again</a>`);
+        res.status(500).json({ success: false, message: "Signup failed." });
     }
 });
 
