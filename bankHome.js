@@ -47,12 +47,12 @@ app.set('view engine', 'ejs');
 
 // renders the WELCOME page with login/signup functionality
 app.get('/', (req, res) => {
-    res.render('index', { isSignup: false }); //uses a variable to toggle between login/signup
+    res.render('index', { isSignup: false, error: null }); //uses a variable to toggle between login/signup
 });
 
 // renders the signup form that shows up when the user clicks "Login here"
 app.get('/signup', (req, res) => {
-    res.render('index', { isSignup: true }); // toggle to display signup form
+    res.render('index', { isSignup: true, error: null }); // toggle to display signup form
 });
 
 // handles the login form submission
@@ -60,21 +60,20 @@ app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ success: false, message: "Email and Password are required!" });
+        return res.render('index', { isSignup: false, error: "Email and Password are required!" });
     }
 
     try {
         const user = await db.collection('users').findOne({ email, password });
 
         if (!user) {
-            return res.status(401).json({ success: false, message: "Invalid email or password!" });
+            return res.render('index', { isSignup: false, error: "Invalid email or password!" });
         }
 
-        res.json({ success: true, message: "Login successful!", user: { email: user.email, name: user.name } });
         res.redirect(`/profile?email=${encodeURIComponent(email)}`);
     } catch (err) {
         console.error("Error during login:", err);
-        res.status(500).json({ success: false, message: "Login failed." });
+        res.render('index', { isSignup: false, error: "An unexpected error occurred during login." });
     }
 });
 
@@ -83,22 +82,21 @@ app.post('/signup', async (req, res) => {
     const { email, password, name } = req.body;
 
     if (!email || !password || !name) {
-        return res.status(400).send("Name, Email, and Password are required!");
+        return res.render('index', { isSignup: true, error: "Name, Email, and Password are required!" });
     }
-
-    const newUser = { name, email, password };
 
     try {
         const existingUser = await db.collection('users').findOne({ email });
 
         if (existingUser) {
-            return res.status(400).json({ success: false, message: "Email already registered!" });
+            return res.render('index', { isSignup: true, error: "Email is already registered!" });
         }
 
-        await db.collection('users').insertOne(newUser);
-        res.redirect('/')
+        await db.collection('users').insertOne({ name, email, password });
+        res.redirect('/');
     } catch (err) {
-        res.status(500).json({ success: false, message: "Signup failed." });
+        console.error("Error during signup:", err);
+        res.render('index', { isSignup: true, error: "An unexpected error occurred during signup." });
     }
 });
 
