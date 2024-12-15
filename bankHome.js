@@ -92,7 +92,7 @@ app.post('/signup', async (req, res) => {
             return res.render('index', { isSignup: true, error: "Email is already registered!" });
         }
 
-        await db.collection('users').insertOne({ name, email, password });
+        await db.collection('users').insertOne({ name, email, password, balance: 0 }); // Initial balance set to 0
         res.redirect('/');
     } catch (err) {
         console.error("Error during signup:", err);
@@ -154,6 +154,73 @@ app.get('/search', async (req, res) => {
         res.status(500).send("Error searching users.");
     }
 });
+
+
+
+
+
+
+
+
+
+
+// deposit money
+app.post('/deposit', async (req, res) => {
+    const { email, depositAmount } = req.body;
+    const amount = parseFloat(depositAmount);
+
+    if (isNaN(amount) || amount <= 0) {
+        return res.status(400).send("Deposit amount must be a positive number.");
+    }
+
+    try {
+        const user = await db.collection('users').findOne({ email });
+        if (!user) {
+            return res.status(404).send("User not found.");
+        }
+
+        const newBalance = user.balance + amount;
+        await db.collection('users').updateOne({ email }, { $set: { balance: newBalance } });
+
+        res.redirect(`/profile?email=${encodeURIComponent(email)}`);
+    } catch (err) {
+        console.error("Error during deposit:", err);
+        res.status(500).send("Error during deposit.");
+    }
+});
+
+// withdraw money
+app.post('/withdraw', async (req, res) => {
+    const { email, withdrawAmount } = req.body;
+    const amount = parseFloat(withdrawAmount);
+
+    if (isNaN(amount) || amount <= 0) {
+        return res.status(400).send("Withdraw amount must be a positive number.");
+    }
+
+    try {
+        const user = await db.collection('users').findOne({ email });
+        if (!user) {
+            return res.status(404).send("User not found.");
+        }
+
+        if (user.balance < amount) {
+            return res.status(400).send("Insufficient funds.");
+        }
+
+        const newBalance = user.balance - amount;
+        await db.collection('users').updateOne({ email }, { $set: { balance: newBalance } });
+
+        res.redirect(`/profile?email=${encodeURIComponent(email)}`);
+    } catch (err) {
+        console.error("Error during withdraw:", err);
+        res.status(500).send("Error during withdraw.");
+    }
+});
+
+
+
+
 /* ROUTES STOP*/
 
 

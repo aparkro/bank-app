@@ -8,7 +8,7 @@
         <h1>Search Results</h1>
         <ul>
             <% users.forEach(user => { %>
-                <li><%= user.name %> - <%= user.email %></li>
+                <li><%= user.name %> --- <%= user.email %> --- Balance: <%= user.balance %></li>
             <% }) %>
         </ul>
     </body>

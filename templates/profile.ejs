@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -6,19 +6,34 @@
     </head>
     <body>
         <h1>Profile</h1>
-        <h1>User Profile</h1>
         <p>Name: <%= user.name %></p>
         <p>Email: <%= user.email %></p>
+        <p>Balance: <%= user.balance %></p>
 
+        <hr>
+        <hr>
 
-        <!--delete-->
-        <form action="/delete" method="POST">
+        <!-- Deposit and Withdraw buttons -->
+        <h3>Deposit / Withdraw</h2>
+        <!-- Deposit Form -->
+        <form action="/deposit" method="POST">
             <input type="hidden" name="email" value="<%= user.email %>">
-            <button type="submit">Delete Account</button>
+            <label for="depositAmount">Deposit Amount:</label>
+            <input type="number" name="depositAmount" min="0.01" step="0.01" required>
+            <button type="submit">Deposit</button>
         </form>
 
+        <form action="/withdraw" method="POST">
+            <input type="hidden" name="email" value="<%= user.email %>">
+            <label for="withdrawAmount">Withdraw Amount:</label>
+            <input type="number" name="withdrawAmount" min="0.01" step="0.01" required>
+            <button type="submit">Withdraw</button>
+        </form>
+
+        <br>
+
         <!--search-->
-        <h2>Search Users</h2>
+        <h3>Search Users</h2>
         <form action="/search" method="GET">
             <input type="text" name="query" placeholder="Search by name or email" required>
             <button type="submit">Search</button>
@@ -31,6 +46,42 @@
                 <% }) %>
             </ul>
         <% } %>
+
+        <br>
+
+        <!-- Transfer Form -->
+        <h3>Transfer Money</h2>
+        <form action="/transfer" method="POST">
+            <input type="hidden" name="senderEmail" value="<%= user.email %>">
+            <label for="recipientEmail">Recipient's Email:</label>
+            <input type="email" name="recipientEmail" required>
+            <br><br>
+            <label for="amount">Amount to Transfer:</label>
+            <input type="number" name="amount" min="0.01" step="0.01" required>
+            <br><br>
+            <button type="submit">Transfer</button>
+        </form>
+
+        <br>
+
+        <!-- Logout Button -->
+        <h3>Logout</h2>
+        <form action="/" method="GET">
+            <button type="submit">Logout</button>
+        </form>
+        
+        <br>
+        <hr>
+        <br>
+
+        <!--delete-->
+        <form action="/delete" method="POST">
+            <input type="hidden" name="email" value="<%= user.email %>">
+            <button type="submit" style="background-color: #B22222; color: white;">Delete Account</button>
+        </form>
+
+        <br>
+        <hr>
 
     </body>
 </html>
