@@ -91,6 +91,12 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .error-message {
+            color: red;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
     </style>
     <script>
         // confirmation function for deleting the account
@@ -116,7 +122,7 @@
 
         <hr>
 
-        <!-- deposit and withdraw -->
+        <!-- deposit money -->
         <h3>Deposit / Withdraw</h3>
         <form action="/deposit" method="POST">
             <input type="hidden" name="email" value="<%= user.email %>">
@@ -125,9 +131,18 @@
             <button type="submit">Deposit</button>
         </form>
 
+        <!-- withdraw money -->
         <form action="/withdraw" method="POST">
             <input type="hidden" name="email" value="<%= user.email %>">
             <label for="withdrawAmount">Withdraw Amount:</label>
+
+            <!-- withdraw error message -->
+            <% if (error) { %>
+                <div class="error-message">
+                    <p><%= error %></p>
+                </div>
+            <% } %>
+
             <input type="number" name="withdrawAmount" min="0.01" step="0.01" required>
             <button type="submit">Withdraw</button>
         </form>

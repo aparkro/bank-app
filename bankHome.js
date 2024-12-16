@@ -120,7 +120,7 @@ app.get('/profile', async (req, res) => {
             return res.status(404).send("User not found.");
         }
 
-        res.render('profile', { user });
+        res.render('profile', { user, error: null });  // pass in error as null since we need to have an error value in case withdrawal fails
     } catch (err) {
         console.error("Error fetching profile:", err);
         res.status(500).send("Error fetching profile.");
@@ -233,19 +233,29 @@ app.post('/withdraw', async (req, res) => {
             return res.status(404).send("User not found.");
         }
 
+        // check if user has enough money to withdraw
         if (user.balance < amount) {
-            return res.status(400).send("Insufficient funds.");
+            // if insufficient funds then pass an error to profile.ejs to be displayed
+            return res.render('profile', { 
+                user, 
+                error: "Insufficient funds."
+            });
         }
 
+        // otherwise if enough money then subtract from balance
         const newBalance = user.balance - amount;
         await db.collection('users').updateOne({ email }, { $set: { balance: newBalance } });
 
+        // redirect back to page to display the new balance
         res.redirect(`/profile?email=${encodeURIComponent(email)}`);
     } catch (err) {
         console.error("Error during withdraw:", err);
         res.status(500).send("Error during withdraw.");
     }
 });
+
+
+
 
 
 
