@@ -1,17 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Search</title>
-    </head>
-    <body>
-        <h1>Search Results</h1>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2d3e50;
+        }
+
+        ul {
+            padding: 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        li {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 10px 0;
+            padding: 15px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+
+        img {
+            margin-left: 15px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-details {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Search Results</h1>
+    <% if (users && users.length > 0) { %>
         <ul>
             <% users.forEach(user => { %>
-                <li><%= user.name %> --- <%= user.email %> --- Balance: <%= user.balance %></li>
-                <img src="https://robohash.org/<%= user.email %>?size=100x100" alt="Profile Picture" style="border-radius: 50%;">
+                <li>
+                    <div class="user-details">
+                        <strong>Name:</strong> <%= user.name %><br>
+                        <strong>Email:</strong> <%= user.email %><br>
+                        <strong>Balance:</strong> $<%= user.balance %>
+                    </div>
+                    <img src="https://robohash.org/<%= user.email %>?size=100x100" alt="Profile Picture">
+                </li>
             <% }) %>
         </ul>
-    </body>
-</html>
+    <% } else { %>
+        <p>No results found.</p>
+    <% } %>
+</body>
 
+</html>

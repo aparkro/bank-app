@@ -4,33 +4,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMD Credit Union</title>
+    <title>Mr.Roboto Credit Union</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #2d3e50;
             text-align: center;
-            margin-top: 50px;
+            margin: 10px 0;
         }
         .form-container {
-            display: inline-block;
-            text-align: left;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 400px;
+            margin-top: 0;
+        }
+        .form-container h2 {
+            color: #2d3e50;
+            font-size: 1.8em;
+            margin: 5px 0;
         }
         input, button {
-            display: block;
-            margin: 10px 0;
-            padding: 8px;
-            width: 100%;
+            width: 93%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        button {
+            background-color: #5c9ded;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #4285f4;
         }
         .error {
-            color: red;
-            margin-bottom: 10px;
+            color: #f44336;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        p {
+            font-size: 1em;
+            color: #555;
+        }
+        a {
+            color: #5c9ded;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .circle-image {
+            display: block;
+            margin: 0px auto;
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #333;
         }
     </style>
 </head>
 
 <body>
-    <h1>WELCOME TO UMD CREDIT UNION</h1>
     <div class="form-container">
+        <h1>Welcome to Mr.Roboto Credit Union</h1>
+        <img src="https://robohash.org/Mr.Roboto" alt="Mr.Roboto" class="circle-image">
         <% if (error) { %>
             <div class="error"><%= error %></div>
         <% } %>

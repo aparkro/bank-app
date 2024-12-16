@@ -1,6 +1,6 @@
 
 //imports and setup stuff
-const express = require('express'); //
+const express = require('express');
 const app = express();  //creates an express instance
 const path = require('path'); 
 const { MongoClient, ServerApiVersion } = require('mongodb'); //imports mongoDB client
@@ -14,7 +14,7 @@ let mongoClient;
 
 async function connectToDB() {
     try {
-        mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+        mongoClient = new MongoClient(uri);
         await mongoClient.connect();
         db = mongoClient.db(process.env.MONGO_DB_NAME);
     } catch (err) {
@@ -46,17 +46,22 @@ app.set('view engine', 'ejs');
 /* ROUTES START*/
 
 
+
 // renders the WELCOME page with login/signup functionality
 app.get('/', (req, res) => {
     res.render('index', { isSignup: false, error: null }); //uses a variable to toggle between login/signup
 });
+
+
 
 // renders the signup form that shows up when the user clicks "Signup here"
 app.get('/signup', (req, res) => {
     res.render('index', { isSignup: true, error: null }); // toggle to display signup form
 });
 
-// handles the login form submission
+
+
+// handles the login form submission (checks if user credentials are legit)
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -78,7 +83,9 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// handles the signup form submission
+
+
+// handles the signup form submission (checks if signup credentials arent already used)
 app.post('/signup', async (req, res) => {
     const { email, password, name } = req.body;
 
@@ -93,7 +100,7 @@ app.post('/signup', async (req, res) => {
             return res.render('index', { isSignup: true, error: "Email is already registered!" });
         }
 
-        await db.collection('users').insertOne({ name, email, password, balance: 0 }); // Initial balance set to 0
+        await db.collection('users').insertOne({ name, email, password, balance: 0 }); // the initial balance set to 0 (as user will have 0 dollars)
         res.redirect('/');
     } catch (err) {
         console.error("Error during signup:", err);
@@ -101,7 +108,9 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-//handles the profile page
+
+
+//finds and renders the user associated with the login information
 app.get('/profile', async (req, res) => {
     const { email } = req.query;
     try {
@@ -118,7 +127,9 @@ app.get('/profile', async (req, res) => {
     }
 });
 
-//delete users
+
+
+//deletes the associated user from the mongoDB database
 app.post('/delete', async (req, res) => {
     const { email } = req.body;
 
@@ -140,7 +151,11 @@ app.post('/delete', async (req, res) => {
     }
 });
 
-//handles the search page
+
+
+// handles the search page
+// uses regex to search for users by name or email and forms an array of users that match
+// then renders search.ejs with the related users
 app.get('/search', async (req, res) => {
     const {query} = req.query;
     try {
@@ -159,11 +174,13 @@ app.get('/search', async (req, res) => {
 });
 
 
-//handles the list users page
+
+// handles the list users page
+// fetches all the users from the database and renders allUsers.ejs which displays all the suers in a list
 app.get('/list-all-users', async (req, res) => {
     try {
-        const users = await db.collection('users').find().toArray(); // Fetch all users from the database
-        res.render('allUsers', { users }); // Render the new template with the user list
+        const users = await db.collection('users').find().toArray();
+        res.render('allUsers', { users });
     } catch (err) {
         console.error("Error fetching all users:", err);
         res.status(500).send("Error fetching users.");
@@ -172,10 +189,9 @@ app.get('/list-all-users', async (req, res) => {
 
 
 
-
-
-
-// deposit money
+// deposit money backend
+// makes sure the amount deposited is not negative
+// adds money to the user balance
 app.post('/deposit', async (req, res) => {
     const { email, depositAmount } = req.body;
     const amount = parseFloat(depositAmount);
@@ -200,7 +216,9 @@ app.post('/deposit', async (req, res) => {
     }
 });
 
-// withdraw money
+// withdraw money backend
+// makes sure the amount withdrawn does not make the balance negative
+// subtracts money from the user balance
 app.post('/withdraw', async (req, res) => {
     const { email, withdrawAmount } = req.body;
     const amount = parseFloat(withdrawAmount);
@@ -232,7 +250,8 @@ app.post('/withdraw', async (req, res) => {
 
 
 
-// Transfer money
+// transfer money from a sender to a receiver
+// subtract from the sender balance and add to the receiver balance
 app.post('/transfer', async (req, res) => {
     const { senderEmail, recipientEmail, amount } = req.body;
     const transferAmount = parseFloat(amount);
@@ -242,7 +261,7 @@ app.post('/transfer', async (req, res) => {
     }
 
     try {
-        // Find sender and recipient
+        // find the sender and recipient from mongoDB
         const sender = await db.collection('users').findOne({ email: senderEmail });
         const recipient = await db.collection('users').findOne({ email: recipientEmail });
 
@@ -256,22 +275,20 @@ app.post('/transfer', async (req, res) => {
             return res.status(400).send("Insufficient funds.");
         }
 
-        // Update balances
+        // update the balance after the transfer
         const newSenderBalance = sender.balance - transferAmount;
         const newRecipientBalance = recipient.balance + transferAmount;
 
         await db.collection('users').updateOne({ email: senderEmail }, { $set: { balance: newSenderBalance } });
         await db.collection('users').updateOne({ email: recipientEmail }, { $set: { balance: newRecipientBalance } });
 
-        // Redirect back to sender's profile
+        // redirect back to the sender profile in order to display the changes
         res.redirect(`/profile?email=${encodeURIComponent(senderEmail)}`);
     } catch (err) {
         console.error("Error during transfer:", err);
         res.status(500).send("Error during transfer.");
     }
 });
-
-
 
 
 

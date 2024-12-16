@@ -1,33 +1,123 @@
-
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Home Page</title>
-        <script>
-            // confirmation function for deleting the account
-            function confirmDeletion(event) {
-                const confirmed = confirm("Are you sure you want to delete your account? This action cannot be undone.");
-                if (!confirmed) {
-                    event.preventDefault(); // prevent the form from being submitted
-                }
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - UMD Credit Union</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #2d3e50;
+            margin-top: 20px;
+        }
+
+        img {
+            margin-top: 20px;
+            border: 5px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 500px;
+            margin: 30px auto;
+        }
+
+        form {
+            margin: 20px 0;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        button {
+            background-color: #5c9ded;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4285f4;
+        }
+
+        button.delete {
+            background-color: #B22222;
+        }
+
+        button.delete:hover {
+            background-color: #8b1a1a;
+        }
+
+        hr {
+            border-top: 5px solid #eee;
+            margin: 20px 0;
+        }
+
+        label {
+            text-align: left;
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        a {
+            color: #5c9ded;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        // confirmation function for deleting the account
+        function confirmDeletion(event) {
+            const confirmed = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+            if (!confirmed) {
+                event.preventDefault();
             }
-        </script>
-    </head>
-    <body>
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
         <h1>Profile</h1>
-        <!-- Uses robohash API to generate a unique profile picture for each user -->
+        <!-- profile picture generated using robohash API -->
         <img src="https://robohash.org/<%= user.email %>" alt="Profile Picture" style="width: 150px; height: 150px; border-radius: 50%;">
+
+        <!-- user info -->
         <p><strong>Name:</strong> <%= user.name %></p>
         <p><strong>Email:</strong> <%= user.email %></p>
-        <p><strong>Balance:</strong> <%= user.balance %></p>
+        <p><strong>Balance:</strong> $<%= user.balance %></p>
 
         <hr>
-        <hr>
 
-        <!-- Deposit and Withdraw buttons -->
-        <h3>Deposit / Withdraw</h2>
-        <!-- Deposit Form -->
+        <!-- deposit and withdraw -->
+        <h3>Deposit / Withdraw</h3>
         <form action="/deposit" method="POST">
             <input type="hidden" name="email" value="<%= user.email %>">
             <label for="depositAmount">Deposit Amount:</label>
@@ -42,16 +132,17 @@
             <button type="submit">Withdraw</button>
         </form>
 
-        <br>
+        <hr>
 
-        <!--search-->
-        <h3>Search Users</h2>
+        <!-- search for users -->
+        <h3>Search Users</h3>
         <form action="/search" method="GET">
             <input type="text" name="query" placeholder="Search by name or email" required>
             <button type="submit">Search</button>
         </form>
+
         <% if (typeof users !== 'undefined') { %>
-            <h2>Search Results</h2>
+            <h3>Search Results</h3>
             <ul>
                 <% users.forEach(user => { %>
                     <li><%= user.name %> - <%= user.email %></li>
@@ -59,56 +150,40 @@
             </ul>
         <% } %>
 
-        <!--list all users-->
+        <!-- list all users -->
         <form action="/list-all-users" method="GET">
             <button type="submit">List All Users</button>
         </form>
 
-        <% if (typeof users !== 'undefined') { %>
-            <h2>Search Results</h2>
-            <ul>
-                <% users.forEach(user => { %>
-                    <li><%= user.name %> - <%= user.email %></li>
-                <% }) %>
-            </ul>
-        <% } %>
+        <hr>
 
-        <br>
-
-        <!-- Transfer Form -->
-        <h3>Transfer Money</h2>
+        <!-- transfer money -->
+        <h3>Transfer Money</h3>
         <form action="/transfer" method="POST">
             <input type="hidden" name="senderEmail" value="<%= user.email %>">
             <label for="recipientEmail">Recipient's Email:</label>
             <input type="email" name="recipientEmail" required>
-            <br><br>
             <label for="amount">Amount to Transfer:</label>
             <input type="number" name="amount" min="0.01" step="0.01" required>
-            <br><br>
             <button type="submit">Transfer</button>
         </form>
 
-        <br>
+        <hr>
 
-        <!-- Logout Button -->
-        <h3>Logout</h2>
+        <!-- logout -->
+        <h3>Logout</h3>
         <form action="/" method="GET">
             <button type="submit">Logout</button>
         </form>
-        
-        <br>
-        <hr>
-        <hr>
-        <br>
 
-        <!--delete-->
+        <hr>
+
+        <!-- delete account -->
         <form action="/delete" method="POST" onsubmit="confirmDeletion(event)">
             <input type="hidden" name="email" value="<%= user.email %>">
-            <button type="submit" style="background-color: #B22222; color: white;">Delete Account</button>
+            <button type="submit" class="delete">Delete Account</button>
         </form>
+    </div>
+</body>
 
-        <br>
-        <hr>
-
-    </body>
 </html>
