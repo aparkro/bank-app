@@ -120,7 +120,7 @@ app.get('/profile', async (req, res) => {
             return res.status(404).send("User not found.");
         }
 
-        res.render('profile', { user, error: null });  // pass in error as null since we need to have an error value in case withdrawal fails
+        res.render('profile', { user, error: null, error2: null });  // pass in error as null since we need to have an error value in case withdrawal fails
     } catch (err) {
         console.error("Error fetching profile:", err);
         res.status(500).send("Error fetching profile.");
@@ -238,7 +238,8 @@ app.post('/withdraw', async (req, res) => {
             // if insufficient funds then pass an error to profile.ejs to be displayed
             return res.render('profile', { 
                 user, 
-                error: "Insufficient funds."
+                error: "Insufficient funds.",
+                error2: null
             });
         }
 
@@ -276,13 +277,25 @@ app.post('/transfer', async (req, res) => {
         const recipient = await db.collection('users').findOne({ email: recipientEmail });
 
         if (!sender) {
-            return res.status(404).send("Sender not found.");
+            return res.render('profile', { 
+                user: sender, 
+                error: null, 
+                error2: "Sender not found."
+            });
         }
         if (!recipient) {
-            return res.status(404).send("Recipient not found.");
+            return res.render('profile', { 
+                user: sender, 
+                error: null, 
+                error2: "Recipient not found."
+            });
         }
         if (sender.balance < transferAmount) {
-            return res.status(400).send("Insufficient funds.");
+            return res.render('profile', { 
+                user: sender, 
+                error: null, 
+                error2: "Insufficient funds."
+            });
         }
 
         // update the balance after the transfer
